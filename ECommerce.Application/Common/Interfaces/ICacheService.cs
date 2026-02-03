@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
-
 namespace ECommerce.Application.Common.Interfaces;
 
 /// <summary>
@@ -8,106 +6,101 @@ namespace ECommerce.Application.Common.Interfaces;
 public interface ICacheService
 {
     /// <summary>
-    /// Cache'den değer al
+    /// Cache'den değer getir
     /// </summary>
     /// <typeparam name="T">Değer tipi</typeparam>
     /// <param name="key">Cache anahtarı</param>
-    /// <returns>Cache'deki değer veya null</returns>
-    T? Get<T>(string key) where T : class;
-
-    /// <summary>
-    /// Cache'den değer al (async)
-    /// </summary>
-    /// <typeparam name="T">Değer tipi</typeparam>
-    /// <param name="key">Cache anahtarı</param>
-    /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Cache'deki değer veya null</returns>
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>Cache'deki değer</returns>
     Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class;
 
     /// <summary>
-    /// Cache'e değer ekle
+    /// Cache'e değer kaydet
     /// </summary>
     /// <typeparam name="T">Değer tipi</typeparam>
     /// <param name="key">Cache anahtarı</param>
-    /// <param name="value">Eklenecek değer</param>
-    /// <param name="expiration">Süre sonu (opsiyonel)</param>
-    void Set<T>(string key, T value, TimeSpan? expiration = null) where T : class;
-
-    /// <summary>
-    /// Cache'e değer ekle (async)
-    /// </summary>
-    /// <typeparam name="T">Değer tipi</typeparam>
-    /// <param name="key">Cache anahtarı</param>
-    /// <param name="value">Eklenecek değer</param>
-    /// <param name="expiration">Süre sonu (opsiyonel)</param>
-    /// <param name="cancellationToken">Cancellation token</param>
+    /// <param name="value">Kaydedilecek değer</param>
+    /// <param name="expiration">Süre sonu</param>
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>İşlem sonucu</returns>
     Task SetAsync<T>(string key, T value, TimeSpan? expiration = null, CancellationToken cancellationToken = default) where T : class;
 
     /// <summary>
     /// Cache'den değer sil
     /// </summary>
     /// <param name="key">Cache anahtarı</param>
-    void Remove(string key);
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>İşlem sonucu</returns>
+    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Cache'den değer sil (async)
+    /// Pattern'e uyan tüm anahtarları sil
+    /// </summary>
+    /// <param name="pattern">Anahtar pattern'i</param>
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>Silinen anahtar sayısı</returns>
+    Task<int> RemoveByPatternAsync(string pattern, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Cache'de anahtar var mı kontrol et
     /// </summary>
     /// <param name="key">Cache anahtarı</param>
-    Task RemoveAsync(string key);
-
-    /// <summary>
-    /// Cache'den pattern'e uyan tüm değerleri sil
-    /// </summary>
-    /// <param name="pattern">Silinecek anahtar pattern'i</param>
-    void RemoveByPattern(string pattern);
-
-    /// <summary>
-    /// Cache'den pattern'e uyan tüm değerleri sil (async)
-    /// </summary>
-    /// <param name="pattern">Silinecek anahtar pattern'i</param>
-    Task RemoveByPatternAsync(string pattern);
-
-    /// <summary>
-    /// Cache'de değer var mı kontrol et
-    /// </summary>
-    /// <param name="key">Cache anahtarı</param>
-    /// <returns>Var mı?</returns>
-    bool Exists(string key);
-
-    /// <summary>
-    /// Cache'de değer var mı kontrol et (async)
-    /// </summary>
-    /// <param name="key">Cache anahtarı</param>
-    /// <returns>Var mı?</returns>
-    Task<bool> ExistsAsync(string key);
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>Anahtar var mı</returns>
+    Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Cache'i temizle
     /// </summary>
-    void Clear();
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>İşlem sonucu</returns>
+    Task ClearAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Cache'i temizle (async)
+    /// Cache istatistikleri
     /// </summary>
-    Task ClearAsync();
+    /// <param name="cancellationToken">İptal token'ı</param>
+    /// <returns>Cache istatistikleri</returns>
+    Task<CacheStatistics> GetStatisticsAsync(CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// Cache istatistikleri
+/// </summary>
+public class CacheStatistics
+{
+    /// <summary>
+    /// Toplam anahtar sayısı
+    /// </summary>
+    public long TotalKeys { get; set; }
 
     /// <summary>
-    /// Cache'den değer al veya oluştur
+    /// Kullanılan bellek (byte)
     /// </summary>
-    /// <typeparam name="T">Değer tipi</typeparam>
-    /// <param name="key">Cache anahtarı</param>
-    /// <param name="factory">Değer oluşturma fonksiyonu</param>
-    /// <param name="expiration">Süre sonu (opsiyonel)</param>
-    /// <returns>Cache'deki veya yeni oluşturulan değer</returns>
-    T GetOrCreate<T>(string key, Func<T> factory, TimeSpan? expiration = null) where T : class;
+    public long UsedMemory { get; set; }
 
     /// <summary>
-    /// Cache'den değer al veya oluştur (async)
+    /// Hit oranı
     /// </summary>
-    /// <typeparam name="T">Değer tipi</typeparam>
-    /// <param name="key">Cache anahtarı</param>
-    /// <param name="factory">Değer oluşturma fonksiyonu</param>
-    /// <param name="expiration">Süre sonu (opsiyonel)</param>
-    /// <returns>Cache'deki veya yeni oluşturulan değer</returns>
-    Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> factory, TimeSpan? expiration = null) where T : class;
+    public decimal HitRate { get; set; }
+
+    /// <summary>
+    /// Miss oranı
+    /// </summary>
+    public decimal MissRate { get; set; }
+
+    /// <summary>
+    /// Toplam istek sayısı
+    /// </summary>
+    public long TotalRequests { get; set; }
+
+    /// <summary>
+    /// Başarılı istek sayısı
+    /// </summary>
+    public long HitCount { get; set; }
+
+    /// <summary>
+    /// Başarısız istek sayısı
+    /// </summary>
+    public long MissCount { get; set; }
 }

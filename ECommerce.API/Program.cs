@@ -218,6 +218,9 @@ app.MapNotificationsEndpoints();
 app.MapCargoEndpoints();
 app.MapCargoCompanyEndpoints();
 
+// Analytics endpoints
+app.MapAnalyticsEndpoints();
+
 // SignalR Hub
 app.MapHub<NotificationHub>("/notificationHub");
 

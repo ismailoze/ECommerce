@@ -34,6 +34,8 @@ public static class DependencyInjection
         services.AddMemoryCache();
         // ICacheService implementasyonu Infrastructure katmanında olacak
 
+        // Analitik servislerini ekle (Infrastructure katmanında kayıt edilecek)
+
         // Scrutor ile otomatik handler kayıtları
         services.Scan(scan => scan
             .FromAssembliesOf(typeof(DependencyInjection))

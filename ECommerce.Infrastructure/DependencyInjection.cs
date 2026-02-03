@@ -48,7 +48,7 @@ public static class DependencyInjection
 
         // Cache Service'i ekle
         services.AddMemoryCache();
-        services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<ICacheService, Services.Cache.MemoryCacheService>();
 
         // Search Service'i ekle
         services.AddScoped<ISearchService, SearchService>();
@@ -66,6 +66,9 @@ public static class DependencyInjection
 
         // Favori liste servislerini ekle
         services.AddWishlistServices(configuration);
+
+        // Analitik servislerini ekle
+        services.AddScoped<ECommerce.Application.Common.Interfaces.IAnalyticsService, Services.Analytics.BasicAnalyticsService>();
 
         return services;
     }
